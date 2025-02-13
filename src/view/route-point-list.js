@@ -2,7 +2,7 @@ import { createElement } from '../render.js';
 
 function createRoutePointListTemplate() {
   return '<ul class="trip-events__list"></ul>';
-};
+}
 
 export default class RoutePointList {
   getTemplate() {

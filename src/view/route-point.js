@@ -38,7 +38,7 @@ function createRoutePointTemplate() {
               </button>
             </div>
           </li>`;
-};
+}
 
 export default class RoutePoint {
   getTemplate() {
