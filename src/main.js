@@ -1,4 +1,4 @@
-import Presenter from './presenter/presenter';
+import Presenter from './presenter/main-presenter';
 
 const presenter = new Presenter();
 
