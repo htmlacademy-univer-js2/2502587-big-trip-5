@@ -8,23 +8,27 @@ import { render, replace } from '../framework/render.js';
 export default class Presenter {
   #RoutePointListComponent = new RoutePointList();
 
-  #mainModel = null;
+  #pointsModel = null;
+  #offersModel = null;
+  #destinationsModel = null;
   #tripEvents = null;
   #tripControlFilters = null;
   #points = null;
   #destinations = null;
   #offers = null;
 
-  constructor({mainModel}) {
-    this.#mainModel = mainModel;
+  constructor({pointsModel, offersModel, destinationsModel}) {
+    this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
     this.#tripEvents = document.querySelector('.trip-events');
     this.#tripControlFilters = document.querySelector('.trip-controls__filters');
   }
 
   init() {
-    this.#points = this.#mainModel.points;
-    this.#offers = this.#mainModel.offers;
-    this.#destinations = this.#mainModel.destinations;
+    this.#points = this.#pointsModel.points;
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationsModel.destinations;
 
     render(new Filters(), this.#tripControlFilters);
     render(new Sorting(), this.#tripEvents);
