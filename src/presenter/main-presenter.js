@@ -4,6 +4,7 @@ import RoutePointList from '../view/route-point-list-view.js';
 import RoutePoint from '../view/route-point-view.js';
 import Sorting from '../view/sorting-view.js';
 import { render, replace } from '../framework/render.js';
+import { isEscapeKey } from '../utils.js';
 
 export default class Presenter {
   #RoutePointListComponent = new RoutePointList();
@@ -41,7 +42,7 @@ export default class Presenter {
 
   #renderPoint(point) {
     const escKeyHandler = (event) => {
-      if (event.key === 'Escape') {
+      if (isEscapeKey(event)) {
         event.preventDefault();
         replaceEditFormToPoint();
         document.removeEventListener('keydown', escKeyHandler);

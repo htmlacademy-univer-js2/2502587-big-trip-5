@@ -39,4 +39,6 @@ function getRandomPrice(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export { convertDate, getDestinationBydI, getDuration, getOffersByType, getRandomPrice };
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export { convertDate, getDestinationBydI, getDuration, getOffersByType, getRandomPrice, isEscapeKey };
