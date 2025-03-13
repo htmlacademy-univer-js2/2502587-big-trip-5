@@ -6,6 +6,7 @@ import Sorting from '../view/sorting-view.js';
 import { render, replace } from '../framework/render.js';
 import { isEscapeKey } from '../utils.js';
 import EmptyListView from '../view/empty-list-view.js';
+import { generateFilter } from '../mock/filters-mock.js';
 
 export default class Presenter {
   #RoutePointListComponent = new RoutePointList();
@@ -32,8 +33,10 @@ export default class Presenter {
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationsModel.destinations;
 
+    const filters = generateFilter(this.#points);
+
     if (this.#points.length > 0) {
-      render(new Filters(), this.#tripControlFilters);
+      render(new Filters({filters}), this.#tripControlFilters);
       render(new Sorting(), this.#tripEvents);
       render(this.#RoutePointListComponent, this.#tripEvents);
 
@@ -41,7 +44,7 @@ export default class Presenter {
         this.#renderPoint(point);
       });
     } else {
-      render(new EmptyListView(), this.#tripEvents)
+      render(new EmptyListView(), this.#tripEvents);
     }
 
   }

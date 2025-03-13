@@ -39,6 +39,20 @@ function getRandomPrice(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const isEscapeKey = (evt) => evt.key === 'Escape';
+function isEscapeKey(evt) {
+  return evt.key === 'Escape';
+}
 
-export { convertDate, getDestinationBydI, getDuration, getOffersByType, getRandomPrice, isEscapeKey };
+function isPointPresent(point) {
+  return dayjs().isAfter(dayjs(point.dateFrom)) && dayjs().isBefore(dayjs(point.dateTo));
+}
+
+function isPointFuture(point) {
+  return dayjs().isBefore(dayjs(point.dateFrom));
+}
+
+function isPointPast(point) {
+  return dayjs().isAfter(dayjs(point.dateTo));
+}
+
+export { convertDate, getDestinationBydI, getDuration, getOffersByType, getRandomPrice, isEscapeKey, isPointPresent, isPointFuture, isPointPast };
