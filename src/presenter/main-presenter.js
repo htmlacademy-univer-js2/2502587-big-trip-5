@@ -1,89 +1,60 @@
 import Filters from '../view/filters-view.js';
-import FormEditing from '../view/form-editing-view.js';
 import RoutePointList from '../view/route-point-list-view.js';
-import RoutePoint from '../view/route-point-view.js';
 import Sorting from '../view/sorting-view.js';
-import { render, replace } from '../framework/render.js';
-import { isEscapeKey } from '../utils.js';
+import { render } from '../framework/render.js';
 import EmptyListView from '../view/empty-list-view.js';
 import { generateFilter } from '../mock/filters-mock.js';
+import PointPresenter from './point-presenter.js';
 
 export default class Presenter {
-  #RoutePointListComponent = new RoutePointList();
-
   #pointsModel = null;
-  #offersModel = null;
   #destinationsModel = null;
+  #offerModel = null;
   #tripEvents = null;
   #tripControlFilters = null;
-  #points = null;
-  #destinations = null;
-  #offers = null;
 
-  constructor({pointsModel, offersModel, destinationsModel}) {
+  #points = [];
+
+  #sortComponent = new Sorting();
+  #eventListComponent = new RoutePointList();
+
+  constructor({pointsModel, offerModel, destinationsModel}) {
     this.#pointsModel = pointsModel;
-    this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#offerModel = offerModel;
+    this.#points = this.#pointsModel.points;
+
     this.#tripEvents = document.querySelector('.trip-events');
     this.#tripControlFilters = document.querySelector('.trip-controls__filters');
   }
 
   init() {
-    this.#points = this.#pointsModel.points;
-    this.#offers = this.#offersModel.offers;
-    this.#destinations = this.#destinationsModel.destinations;
-
     const filters = generateFilter(this.#points);
+    render(new Filters({filters}), this.#tripControlFilters);
 
-    if (this.#points.length > 0) {
-      render(new Filters({filters}), this.#tripControlFilters);
-      render(new Sorting(), this.#tripEvents);
-      render(this.#RoutePointListComponent, this.#tripEvents);
+    this.#renderBoard();
 
-      this.#points.forEach((point) => {
-        this.#renderPoint(point);
-      });
-    } else {
+    this.#points.forEach((point) => {
+      this.#renderPoint(point);
+    });
+  }
+
+  #renderBoard() {
+    if (this.#points.length === 0) {
       render(new EmptyListView(), this.#tripEvents);
+      return;
     }
 
+    render(this.#sortComponent, this.#tripEvents);
+    render(this.#eventListComponent, this.#tripEvents);
   }
 
-  #renderPoint(point) {
-    const escKeyHandler = (event) => {
-      if (isEscapeKey(event)) {
-        event.preventDefault();
-        replaceEditFormToPoint();
-        document.removeEventListener('keydown', escKeyHandler);
-      }
-    };
-
-    const editForm = new FormEditing({point, destinations: this.#destinations, offers: this.#offers,
-      onSubmitClick: () => {
-        replaceEditFormToPoint();
-        document.removeEventListener('keydown', escKeyHandler);
-      },
-      onRollButtonClick: () => {
-        replaceEditFormToPoint();
-        document.removeEventListener('keydown', escKeyHandler);
-      }
+  #renderPoint = (point) => {
+    const pointPresenter = new PointPresenter({
+      pointListContainer: this.#eventListComponent,
+      destinationModel: this.#destinationsModel
     });
 
-    const pointItem = new RoutePoint({point, destinations: this.#destinations, offers: this.#offers,
-      onRollButtonClick: () => {
-        replacePointToEditForm();
-        document.addEventListener('keydown', escKeyHandler);
-      }
-    });
-
-    function replacePointToEditForm() {
-      replace(editForm, pointItem);
-    }
-
-    function replaceEditFormToPoint() {
-      replace(pointItem, editForm);
-    }
-
-    render(pointItem, this.#RoutePointListComponent.element);
-  }
+    pointPresenter.init(point);
+  };
 }
