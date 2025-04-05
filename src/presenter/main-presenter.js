@@ -4,57 +4,70 @@ import Sorting from '../view/sorting-view.js';
 import { render } from '../framework/render.js';
 import EmptyListView from '../view/empty-list-view.js';
 import { generateFilter } from '../mock/filters-mock.js';
-import PointPresenter from './point-presenter.js';
+import { PointPresenter } from './point-presenter.js';
+import { updatePointData } from '../utils.js';
 
 export default class Presenter {
+  #RoutePointListComponent = new RoutePointList();
+
   #pointsModel = null;
+  #offersModel = null;
   #destinationsModel = null;
-  #offerModel = null;
   #tripEvents = null;
   #tripControlFilters = null;
+  #points = null;
+  #destinations = null;
+  #offers = null;
 
-  #points = [];
+  #pointPresenters = new Map();
 
-  #sortComponent = new Sorting();
-  #eventListComponent = new RoutePointList();
-
-  constructor({pointsModel, offerModel, destinationsModel}) {
+  constructor({pointsModel, offersModel, destinationsModel}) {
     this.#pointsModel = pointsModel;
+    this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
-    this.#offerModel = offerModel;
-    this.#points = this.#pointsModel.points;
-
     this.#tripEvents = document.querySelector('.trip-events');
     this.#tripControlFilters = document.querySelector('.trip-controls__filters');
   }
 
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #handlePointUpdate = (updatedPoint) => {
+    this.#points = updatePointData(this.#points, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
+
   init() {
+    this.#points = this.#pointsModel.points;
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationsModel.destinations;
+
     const filters = generateFilter(this.#points);
-    render(new Filters({filters}), this.#tripControlFilters);
 
-    this.#renderBoard();
+    if (this.#points.length > 0) {
+      render(new Filters({filters}), this.#tripControlFilters);
+      render(new Sorting(), this.#tripEvents);
+      render(this.#RoutePointListComponent, this.#tripEvents);
 
-    this.#points.forEach((point) => {
-      this.#renderPoint(point);
-    });
-  }
-
-  #renderBoard() {
-    if (this.#points.length === 0) {
+      this.#points.forEach((point) => {
+        this.#renderPoint(point);
+      });
+    } else {
       render(new EmptyListView(), this.#tripEvents);
-      return;
     }
-
-    render(this.#sortComponent, this.#tripEvents);
-    render(this.#eventListComponent, this.#tripEvents);
   }
 
-  #renderPoint = (point) => {
+  #renderPoint(point) {
     const pointPresenter = new PointPresenter({
-      pointListContainer: this.#eventListComponent,
-      destinationModel: this.#destinationsModel
+      destinations: this.#destinations,
+      offers: this.#offers,
+      pointsListComponent: this.#RoutePointListComponent,
+      changeDataOnFavorite: this.#handlePointUpdate,
+      changeMode: this.#handleModeChange
     });
 
     pointPresenter.init(point);
-  };
+    this.#pointPresenters.set(point.id, pointPresenter);
+  }
 }
