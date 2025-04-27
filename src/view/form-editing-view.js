@@ -1,6 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { convertDate } from '../utils.js';
 import { Formats, EVENT_TYPES } from '../consts.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createPointTypesTemplate(type) {
   return (
@@ -120,6 +122,8 @@ export default class FormEditing extends AbstractStatefulView {
   #destinations = null;
   #handleFormSubmit = null;
   #handleFormReset = null;
+  #datepickerStart = null;
+  #datepickerEnd = null;
 
   constructor({point, offers, destinations, onFormSubmit, onFormReset}) {
     super();
@@ -179,6 +183,46 @@ export default class FormEditing extends AbstractStatefulView {
     this.updateElement(point);
   }
 
+  #dateFromChangeHandler = ([userDate]) => {
+    this._setState({
+      dateFrom: userDate
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this._setState({
+      dateTo: userDate
+    });
+  };
+
+  #setDatepickerStart() {
+    this.#datepickerStart = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        'time_24hr': true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler,
+        maxDate: this._state.dateTo
+      }
+    );
+  }
+
+  #setDatepickerEnd() {
+    this.#datepickerEnd = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        'time_24hr': true,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dateToChangeHandler,
+        minDate: this._state.dateFrom
+      }
+    );
+  }
+
   _restoreHandlers() {
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
     this.element.querySelector('form').addEventListener('reset', this.#formResetHandler);
@@ -187,5 +231,8 @@ export default class FormEditing extends AbstractStatefulView {
     this.element.querySelector('.event__available-offers').addEventListener('change', this.#offersChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceInputHandler);
+
+    this.#setDatepickerStart();
+    this.#setDatepickerEnd();
   }
 }
