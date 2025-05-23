@@ -106,7 +106,7 @@ export class PointPresenter {
   #editFormResetHandler = () => {
     this.#replacePointToEditForm();
     document.addEventListener('keydown', this.#escKeyHandler);
-  }
+  };
 
   #handleDeleteButtonClick = (point) => {
     this.#handleDataChange(UserAction.DELETE_POINT, UpdateType.MINOR, point);

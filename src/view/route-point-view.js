@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { convertDate, getDuration, getOffersByType, getMonthAndDate, getDestinationById, getOfferById } from '../utils.js';
+import { convertDate, getDuration, getMonthAndDate, getDestinationById, getOfferById } from '../utils.js';
 import { Formats } from '../consts.js';
 
 function createRoutePointTemplate(point) {

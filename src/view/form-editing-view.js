@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { convertDate, getFullDate, capitalizeWord, getDestinationById, getOfferById } from '../utils.js';
-import { Formats, EVENT_TYPES } from '../consts.js';
+import { getFullDate, capitalizeWord, getDestinationById, getOfferById } from '../utils.js';
+import { EVENT_TYPES } from '../consts.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
@@ -26,9 +26,9 @@ function createFormEditingTemplate(point, destinations) {
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-                        ${EVENT_TYPES.map((type) => `<div class="event__type-item">
-                          <input id="event-type-${type.toLowerCase()}-1" class="event__${type.toLowerCase()}-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}">
-                          <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${capitalizeWord(type)}</label>
+                        ${EVENT_TYPES.map((types) => `<div class="event__type-item">
+                          <input id="event-type-${types.toLowerCase()}-1" class="event__${types.toLowerCase()}-input  visually-hidden" type="radio" name="event-type" value="${types.toLowerCase()}">
+                          <label class="event__type-label  event__type-label--${types.toLowerCase()}" for="event-type-${types.toLowerCase()}-1">${capitalizeWord(types)}</label>
                         </div>`).join('')}
                       </fieldset>
                     </div>
