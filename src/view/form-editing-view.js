@@ -139,13 +139,12 @@ export default class FormEditing extends AbstractStatefulView {
   #pointTypeChangeHandler = (evt) => {
     evt.preventDefault();
     const targetType = evt.target.value;
-    // const typeOffers = this.#offers.find((item) => item.type === targetType).offers.map((offer) => offer.id);
-    // this.#typeOffers = typeOffers;
+    const typeOffers = this.#offers.find((item) => item.type === targetType).offers.map((offer) => offer.id);
+    this.#typeOffers = typeOffers;
     this.updateElement({
       type: targetType,
       offers: []
     });
-    evt.preventDefault();
   };
 
   #destinationChangeHandler = (evt) => {

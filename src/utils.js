@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-// import { SortTypes } from './consts.js';
 
 function convertDate(date, newFormat) {
   return dayjs(date).format(newFormat);
@@ -50,22 +49,6 @@ function isPointFuture(point) {
 function isPointPast(point) {
   return dayjs().isAfter(dayjs(point.dateTo));
 }
-
-// function updatePointData(points, updatedPointData) {
-//   return points.map((point) => point.id === updatedPointData.id ? updatedPointData : point);
-// }
-
-// function sortByDay(pointA, pointB){
-//   return new Date(pointA.dateFrom) - new Date(pointB.dateFrom);
-// }
-
-// function sortByPrice(pointA, pointB){
-//   return pointB.basePrice - pointA.basePrice;
-// }
-
-// function sortByDuration(pointA, pointB){
-//   return dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom)) - dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
-// }
 
 const capitalizeWord = (word) => word.charAt(0).toUpperCase() + word.slice(1);
 
@@ -121,10 +104,6 @@ export {
   isPointPresent,
   isPointFuture,
   isPointPast,
-  // updatePointData,
-  // sortByDay,
-  // sortByDuration,
-  // sortByPrice,
   capitalizeWord,
   getMonthAndDate,
   getFullDate,
