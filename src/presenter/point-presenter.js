@@ -4,33 +4,46 @@ import {render, replace, remove} from '../framework/render.js';
 import { isEscapeKey } from '../utils.js';
 import { Mode, UserAction, UpdateType } from '../consts.js';
 
-export class PointPresenter {
+export default class PointPresenter {
   #destinations = null;
   #offers = null;
   #point = null;
   #pointItem = null;
   #editFormItem = null;
   #pointsListComponent = null;
-  #handleDataChange = null;
-  #handleModeChange = null;
+  #onDataChange = null;
+  #onModeChange = null;
   #mode = Mode.DEFAULT;
   #typeOffers = null;
-
-  #escKeyHandler = (event) => {
-    if (isEscapeKey(event)) {
-      event.preventDefault();
-      this.#replaceEditFormToPoint();
-      document.removeEventListener('keydown', this.#escKeyHandler);
-    }
-  };
 
   constructor({ destinations, offers, pointsListComponent, changeDataOnFavorite, changeMode, typeOffers }) {
     this.#destinations = destinations;
     this.#offers = offers;
     this.#pointsListComponent = pointsListComponent;
-    this.#handleDataChange = changeDataOnFavorite;
-    this.#handleModeChange = changeMode;
+    this.#onDataChange = changeDataOnFavorite;
+    this.#onModeChange = changeMode;
     this.#typeOffers = typeOffers;
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointItem.shake();
+      return;
+    }
+
+    this.#editFormItem.shake(this.#editFormItem.updateElement({ isDisabled: false, isSaving: false, isDeleting: false }));
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editFormItem.updateElement({ isDisabled: true, isSaving: true });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editFormItem.updateElement({ isDisabled: true, isDeleting: true });
+    }
   }
 
   destroy(){
@@ -46,7 +59,7 @@ export class PointPresenter {
     this.#pointItem = new RoutePoint({point: this.#point,
       destinations: this.#destinations,
       offers: this.#offers,
-      onRollButtonClick: this.#editFormResetHandler.bind(this),
+      onRollButtonClick: this.#onEditFormReset.bind(this),
       onFavoriteClick: this.#addToFaivorite
     });
 
@@ -54,10 +67,10 @@ export class PointPresenter {
       point: this.#point,
       offers: this.#offers,
       destinations: this.#destinations,
-      onFormSubmit: this.#editFormSubmitHandler.bind(this),
+      onFormSubmit: this.#onEditFormSubmit.bind(this),
       onFormReset: this.#replaceEditFormToPoint.bind(this),
       typeOffers: this.#typeOffers,
-      onDeleteClick: this.#handleDeleteButtonClick
+      onDeleteClick: this.#onDeleteButtonClick
     });
 
     if (prevPointComponent === null || prevEditFormComponent === null) {
@@ -85,56 +98,42 @@ export class PointPresenter {
 
   #replacePointToEditForm() {
     replace(this.#editFormItem, this.#pointItem);
-    this.#handleModeChange();
+    this.#onModeChange();
     this.#mode = Mode.EDITING;
   }
 
   #replaceEditFormToPoint() {
     replace(this.#pointItem, this.#editFormItem);
-    document.removeEventListener('keydown', this.#escKeyHandler);
+    document.removeEventListener('keydown', this.#onEscKey);
     this.#mode = Mode.DEFAULT;
-    this.#editFormItem.reset(this.#point);
   }
 
   #addToFaivorite = (point) => {
-    this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, {...point, isFavorite: !point.isFavorite});
+    this.#onDataChange(UserAction.UPDATE_POINT, UpdateType.PATCH, {...point, isFavorite: !point.isFavorite});
   };
 
-  #editFormSubmitHandler = async (point) => {
-    await this.#handleDataChange(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
+  #onEditFormSubmit = async (point) => {
+    await this.#onDataChange(UserAction.UPDATE_POINT, UpdateType.MINOR, point);
     if (point.isSaving) {
       this.#replaceEditFormToPoint();
-      document.removeEventListener('keydown', this.#escKeyHandler);
+      document.removeEventListener('keydown', this.#onEscKey);
     }
   };
 
-  #editFormResetHandler = () => {
+  #onEditFormReset = () => {
     this.#replacePointToEditForm();
-    document.addEventListener('keydown', this.#escKeyHandler);
+    document.addEventListener('keydown', this.#onEscKey);
   };
 
-  #handleDeleteButtonClick = (point) => {
-    this.#handleDataChange(UserAction.DELETE_POINT, UpdateType.MINOR, point);
+  #onDeleteButtonClick = (point) => {
+    this.#onDataChange(UserAction.DELETE_POINT, UpdateType.MINOR, point);
   };
 
-  setAborting() {
-    if (this.#mode === Mode.DEFAULT) {
-      this.#pointItem.shake();
-      return;
+  #onEscKey = (event) => {
+    if (isEscapeKey(event)) {
+      event.preventDefault();
+      this.#replaceEditFormToPoint();
+      document.removeEventListener('keydown', this.#onEscKey);
     }
-
-    this.#editFormItem.shake(this.#editFormItem.updateElement({ isDisabled: false, isSaving: false, isDeleting: false }));
-  }
-
-  setSaving() {
-    if (this.#mode === Mode.EDITING) {
-      this.#editFormItem.updateElement({ isDisabled: true, isSaving: true });
-    }
-  }
-
-  setDeleting() {
-    if (this.#mode === Mode.EDITING) {
-      this.#editFormItem.updateElement({ isDisabled: true, isDeleting: true });
-    }
-  }
+  };
 }
