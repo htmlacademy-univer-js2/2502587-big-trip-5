@@ -1,8 +1,8 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { NoPointMessages } from '../consts.js';
+import { MessageNoPoint } from '../consts.js';
 
 function createEmptyListTemplate(filterType) {
-  return `<p class="trip-events__msg">${NoPointMessages[filterType.toUpperCase()]}</p>`;
+  return `<p class="trip-events__msg">${MessageNoPoint[filterType.toUpperCase()]}</p>`;
 }
 
 export default class EmptyListView extends AbstractView {
