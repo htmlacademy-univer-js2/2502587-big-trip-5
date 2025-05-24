@@ -55,15 +55,12 @@ export default class Presenter {
         this.#pointPresenters.get(update.id).init(update);
         break;
       case UpdateType.MINOR:
-        this.#clearListView();
-        this.#renderPointList();
+        this.#resetPointList();
         break;
       case UpdateType.MAJOR:
-        this.#clearListView();
-        this.#renderPointList(true);
+        this.#resetPointList(true);
         break;
       case UpdateType.INIT:
-        this.#isLoading = false;
         remove(this.#loadingComponent);
         if (update.isLoadingFailed) {
           this.#renderError();
@@ -72,6 +69,11 @@ export default class Presenter {
         }
     }
   };
+
+  #resetPointList(isFilterTypeChanged = false) {
+    this.#clearListView();
+    this.#renderPointList(isFilterTypeChanged);
+  }
 
   #handleModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
@@ -106,7 +108,7 @@ export default class Presenter {
           await this.#pointsModel.updatePoint(updateType, update);
           break;
         case UserAction.ADD_POINT:
-          presenter.setSaving();
+          this.#pointCreationPresenter.setSaving();
           await this.#pointsModel.addPoint(updateType, update);
           break;
         case UserAction.DELETE_POINT:
@@ -150,13 +152,13 @@ export default class Presenter {
   }
 
   #renderPointList(isFilterTypeChanged = false) {
-    if (this.#isLoading) {
+    if (this.#pointsModel.loading) {
       this.#renderLoading();
       return;
     }
 
     if (isFilterTypeChanged) {
-      this.#currentSortType = 'day';
+      this.#currentSortType = SortTypes.DAY;
       this.#renderSort();
     }
 
@@ -164,7 +166,7 @@ export default class Presenter {
     render(this.#pointListComponent, this.#eventsContainer);
     if (this.points.length > 0) {
       this.points.forEach((point) => this.#renderPoint(point));
-    } else {
+    } else if (!isFilterTypeChanged) {
       this.#renderEmptyPointList();
     }
   }
