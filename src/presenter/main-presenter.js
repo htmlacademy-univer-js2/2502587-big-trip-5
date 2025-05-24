@@ -48,6 +48,36 @@ export default class Presenter {
     });
   }
 
+  get points() {
+    this.#filterType = this.#filterModel.filter;
+    let points = this.#pointsModel.points;
+
+    switch (this.#currentSortType) {
+      case SortType.PRICE:
+        points = SortingBySection[SortType.PRICE](points);
+        break;
+      case SortType.TIME:
+        points = SortingBySection[SortType.TIME](points);
+        break;
+      default:
+        points = SortingBySection[SortType.DAY](points);
+        break;
+    }
+    return Filter[this.#filterType](points);
+  }
+
+  get destinations() {
+    return this.#pointsModel.destinations;
+  }
+
+  get offers() {
+    return this.#pointsModel.offers;
+  }
+
+  async init() {
+    this.#onSortChange(SortType.DAY);
+  }
+
   #onModelChange = (updateType, update) => {
     switch (updateType) {
       case UpdateType.PATCH:
@@ -78,10 +108,6 @@ export default class Presenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
     this.#pointCreationPresenter.destroy();
   };
-
-  async init() {
-    this.#onSortChange(SortType.DAY);
-  }
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
@@ -181,31 +207,5 @@ export default class Presenter {
   #renderEmptyPointList() {
     this.#emptyPointListComponent = new EmptyListView({ filterType: this.#filterType });
     render(this.#emptyPointListComponent, this.#pointListComponent.element, RenderPosition.AFTERBEGIN);
-  }
-
-  get points() {
-    this.#filterType = this.#filterModel.filter;
-    let points = this.#pointsModel.points;
-
-    switch (this.#currentSortType) {
-      case SortType.PRICE:
-        points = SortingBySection[SortType.PRICE](points);
-        break;
-      case SortType.TIME:
-        points = SortingBySection[SortType.TIME](points);
-        break;
-      default:
-        points = SortingBySection[SortType.DAY](points);
-        break;
-    }
-    return Filter[this.#filterType](points);
-  }
-
-  get destinations() {
-    return this.#pointsModel.destinations;
-  }
-
-  get offers() {
-    return this.#pointsModel.offers;
   }
 }

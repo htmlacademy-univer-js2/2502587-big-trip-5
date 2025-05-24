@@ -121,6 +121,25 @@ export default class FormEditing extends AbstractStatefulView {
     return createFormEditingTemplate(this._state, this.#destinations, this.#offers, this.#typeOffers);
   }
 
+  reset(point) {
+    this.updateElement(point);
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('form').addEventListener('submit', this.#onFormSubmit);
+    if (this.#formReset) {
+      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onFormReset);
+    }
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onEditDelete);
+    this.element.querySelector('.event__type-group').addEventListener('change', this.#onPointTypeChange);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#onPriceInput);
+
+    const typeOffers = this.element.querySelectorAll('.event__offer-checkbox');
+    typeOffers.forEach((offer) => offer.addEventListener('change', this.#onOffersChange));
+    this.#setDatepicker();
+  }
+
   #onFormSubmit = (evt) => {
     evt.preventDefault();
     this.#formSubmit(this._state);
@@ -167,10 +186,6 @@ export default class FormEditing extends AbstractStatefulView {
     });
   };
 
-  reset(point) {
-    this.updateElement(point);
-  }
-
   #onDateFromChange = ([userDate]) => {
     this._setState({
       dateFrom: userDate
@@ -208,21 +223,6 @@ export default class FormEditing extends AbstractStatefulView {
         minDate: this._state.dateFrom
       }
     );
-  }
-
-  _restoreHandlers() {
-    this.element.querySelector('form').addEventListener('submit', this.#onFormSubmit);
-    if (this.#formReset) {
-      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onFormReset);
-    }
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onEditDelete);
-    this.element.querySelector('.event__type-group').addEventListener('change', this.#onPointTypeChange);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#onDestinationChange);
-    this.element.querySelector('.event__input--price').addEventListener('input', this.#onPriceInput);
-
-    const typeOffers = this.element.querySelectorAll('.event__offer-checkbox');
-    typeOffers.forEach((offer) => offer.addEventListener('change', this.#onOffersChange));
-    this.#setDatepicker();
   }
 
   #onOffersChange = (evt) => {

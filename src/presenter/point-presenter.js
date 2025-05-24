@@ -16,14 +16,6 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
   #typeOffers = null;
 
-  #onEscKey = (event) => {
-    if (isEscapeKey(event)) {
-      event.preventDefault();
-      this.#replaceEditFormToPoint();
-      document.removeEventListener('keydown', this.#onEscKey);
-    }
-  };
-
   constructor({ destinations, offers, pointsListComponent, changeDataOnFavorite, changeMode, typeOffers }) {
     this.#destinations = destinations;
     this.#offers = offers;
@@ -31,6 +23,27 @@ export default class PointPresenter {
     this.#onDataChange = changeDataOnFavorite;
     this.#onModeChange = changeMode;
     this.#typeOffers = typeOffers;
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointItem.shake();
+      return;
+    }
+
+    this.#editFormItem.shake(this.#editFormItem.updateElement({ isDisabled: false, isSaving: false, isDeleting: false }));
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editFormItem.updateElement({ isDisabled: true, isSaving: true });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editFormItem.updateElement({ isDisabled: true, isDeleting: true });
+    }
   }
 
   destroy(){
@@ -116,24 +129,11 @@ export default class PointPresenter {
     this.#onDataChange(UserAction.DELETE_POINT, UpdateType.MINOR, point);
   };
 
-  setAborting() {
-    if (this.#mode === Mode.DEFAULT) {
-      this.#pointItem.shake();
-      return;
+  #onEscKey = (event) => {
+    if (isEscapeKey(event)) {
+      event.preventDefault();
+      this.#replaceEditFormToPoint();
+      document.removeEventListener('keydown', this.#onEscKey);
     }
-
-    this.#editFormItem.shake(this.#editFormItem.updateElement({ isDisabled: false, isSaving: false, isDeleting: false }));
-  }
-
-  setSaving() {
-    if (this.#mode === Mode.EDITING) {
-      this.#editFormItem.updateElement({ isDisabled: true, isSaving: true });
-    }
-  }
-
-  setDeleting() {
-    if (this.#mode === Mode.EDITING) {
-      this.#editFormItem.updateElement({ isDisabled: true, isDeleting: true });
-    }
-  }
+  };
 }

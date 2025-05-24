@@ -1,7 +1,7 @@
 import FormEditing from '../view/form-editing-view.js';
 import { render, remove, RenderPosition } from '../framework/render';
 import { UserAction, UpdateType, FilterType } from '../consts.js';
-import { getOffersByType } from '../utils.js';
+import { getOffersByType, isEscapeKey } from '../utils.js';
 
 export default class PointCreationPresenter {
   #pointListComponent = null;
@@ -25,6 +25,14 @@ export default class PointCreationPresenter {
     this.#addButton.addEventListener('click', this.#onAddButtonClick);
   }
 
+  setAborting() {
+    this.#pointEditComponent.shake(this.#pointEditComponent.updateElement({ isSaving: false, isDisabled: false }));
+  }
+
+  setSaving() {
+    this.#pointEditComponent.updateElement({isSaving: true, isDisabled: true });
+  }
+
   init() {
     this.#pointEditComponent = new FormEditing({
       point: this.#point,
@@ -38,6 +46,11 @@ export default class PointCreationPresenter {
     this.#pointEditComponent.updateElement({ isPointCreation: true });
     render(this.#pointEditComponent, this.#pointListComponent.element, RenderPosition.AFTERBEGIN);
   }
+
+  destroy = () => {
+    remove(this.#pointEditComponent);
+    this.#addButton.disabled = false;
+  };
 
   #onAddButtonClick = () => {
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
@@ -62,24 +75,11 @@ export default class PointCreationPresenter {
   };
 
   #onEscKeydown = (evt) => {
-    if (evt.key === 'Escape') {
+    if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.#filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
       this.destroy();
       document.removeEventListener('keydown', this.#onEscKeydown);
     }
   };
-
-  destroy = () => {
-    remove(this.#pointEditComponent);
-    this.#addButton.disabled = false;
-  };
-
-  setAborting() {
-    this.#pointEditComponent.shake(this.#pointEditComponent.updateElement({ isSaving: false, isDisabled: false }));
-  }
-
-  setSaving() {
-    this.#pointEditComponent.updateElement({isSaving: true, isDisabled: true });
-  }
 }
