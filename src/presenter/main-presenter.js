@@ -23,7 +23,6 @@ export default class Presenter {
   #pointPresenters = new Map();
   #loadingComponent = new LoadingView();
   #errorComponent = new ErrorView();
-  #isLoading = true;
   #addButton = document.querySelector('.trip-main__event-add-btn');
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,

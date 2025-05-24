@@ -28,12 +28,6 @@ function getDuration(dateFrom, dateTo){
 
 const getOffersByType = (offers, type) => offers.find((item) => item.type === type).offers.map((offer) => offer.id);
 
-function getRandomPrice(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function isEscapeKey(evt) {
   return evt.key === 'Escape';
 }
@@ -79,7 +73,7 @@ const sort = {
 
 const getDayAndMonth = (date) => dayjs(date).format('D MMM');
 
-const getRouteDates =(points) => points.length > 0 ? [getDayAndMonth(points[0].dateFrom), getDayAndMonth(points[points.length - 1].dateTo)] : ['', ''];
+const getRouteDates = (points) => points.length > 0 ? [getDayAndMonth(points[0].dateFrom), getDayAndMonth(points[points.length - 1].dateTo)] : ['', ''];
 
 const getRoute = (points, destinations) => {
   const route = points.map((point) => getDestinationById(destinations, point.destination).name);
@@ -99,7 +93,6 @@ export {
   getDestinationById,
   getDuration,
   getOffersByType,
-  getRandomPrice,
   isEscapeKey,
   isPointPresent,
   isPointFuture,
